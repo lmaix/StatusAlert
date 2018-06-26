@@ -47,7 +47,7 @@ import UIKit
     /// or to dismiss currently presented alerts if `multiplePresentationsBehavior` is `dismissCurrentlyPresented`
     private static var currentlyPresentedStatusAlerts: [StatusAlert] = []
     
-    private let defaultFadeAnimationDuration: TimeInterval = TimeInterval(UINavigationControllerHideShowBarDuration)
+    private let defaultFadeAnimationDuration: TimeInterval = TimeInterval(UINavigationController.hideShowBarDuration)
     private let blurEffect: UIBlurEffect = UIBlurEffect(style: .light)
     
     /// @1x should be 90*90 by default
@@ -123,10 +123,12 @@ import UIKit
         
         let statusAlert = StatusAlert()
         
+        // NSNotification.Name.UIAccessibility.reduceTransparencyStatusDidChangeNotification
+        
         NotificationCenter.default.addObserver(
             statusAlert,
             selector: #selector(statusAlert.reduceTransparencyStatusDidChange),
-            name: NSNotification.Name.UIAccessibilityReduceTransparencyStatusDidChange,
+            name: NSNotification.Name?.none,
             object: nil
         )
         
@@ -273,7 +275,7 @@ import UIKit
         
         self.isAccessibilityElement = false
         self.accessibilityElementsHidden = true
-        self.accessibilityTraits = UIAccessibilityTraitNone
+        self.accessibilityTraits = .none
         
         let stackView = self.createStackView()
         
@@ -491,7 +493,7 @@ import UIKit
         imageView.contentMode = .scaleAspectFit
         imageView.tintColor = self.appearance.tintColor
         imageView.isAccessibilityElement = false
-        imageView.accessibilityTraits = UIAccessibilityTraitNone
+        imageView.accessibilityTraits = .none
         
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
@@ -545,7 +547,7 @@ import UIKit
         label.numberOfLines = 0
         label.textColor = self.appearance.tintColor
         label.isAccessibilityElement = false
-        label.accessibilityTraits = UIAccessibilityTraitNone
+        label.accessibilityTraits = .none
         return label
     }
     
@@ -590,7 +592,7 @@ import UIKit
         if let timer = self.timer {
             RunLoop.main.add(
                 timer,
-                forMode: RunLoopMode.commonModes
+                forMode: RunLoop.Mode.common
             )
         }
         self.contentView.transform = CGAffineTransform.identity.scaledBy(x: scale, y: scale)
@@ -598,7 +600,7 @@ import UIKit
         UIView.animate(
             withDuration: self.defaultFadeAnimationDuration,
             delay: 0,
-            options: UIViewAnimationOptions.curveEaseOut,
+            options: UIView.AnimationOptions.curveEaseOut,
             animations: {
                 if self.isBlurAvailable {
                     if #available(iOS 11, *) {
@@ -613,7 +615,7 @@ import UIKit
                 self.contentView.transform = CGAffineTransform.identity
         },
             completion: { [weak self] (_) in
-                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, self?.accessibilityAnnouncement)
+                UIAccessibility.post(notification: UIAccessibility.Notification.announcement, argument: self?.accessibilityAnnouncement)
         })
     }
 
@@ -632,7 +634,7 @@ import UIKit
             UIView.animate(
                 withDuration: self.defaultFadeAnimationDuration,
                 delay: 0,
-                options: UIViewAnimationOptions.curveEaseOut,
+                options: UIView.AnimationOptions.curveEaseOut,
                 animations: {
                     if self.isBlurAvailable {
                         if #available(iOS 11, *) {
@@ -667,6 +669,6 @@ import UIKit
 // Compatibility
 
 #if swift(>=4.0)
-private let NSKernAttributeName = NSAttributedStringKey.kern
-private let NSParagraphStyleAttributeName = NSAttributedStringKey.paragraphStyle
+private let NSKernAttributeName = NSAttributedString.Key.kern
+private let NSParagraphStyleAttributeName = NSAttributedString.Key.paragraphStyle
 #endif
